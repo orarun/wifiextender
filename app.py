@@ -16,7 +16,7 @@ class WifiNetwork:
 		self.rate = rate
 		self.signal = signal
 
-	def connect(self, password):
+	def connect(self, passwd):
 		connect = subprocess.check_output('nmcli dev wifi connect ' + self.ssid + ' password ' + passwd, text=True, shell=True)
 		
 
@@ -39,7 +39,7 @@ def index():
 		clients = wifiClients()
 		currentConn = getCurrentConn()
 
-		return render_template("main.html", wan=wan, lan=lan, clients=clients, myap=myAP, currentconn=currentConn)(butt
+		return render_template("main.html", wan=wan, lan=lan, clients=clients, myap=myAP, currentconn=currentConn)
 		
 	else:
 		# If "Disconnect" button has been pressed then disconnect from current wifi connection and purge all saved wifi networks
@@ -74,7 +74,10 @@ def networks():
 		else:
 			# Delete last empty string of the output
 			output = output[:-1]
+
 			outputList = stdoutParse(output)
+			wifiList = stdoutParse1(output)
+			print(wifiList)
 		#outputList = [['YourAPSSID', '1', '65 Mbit/s', '100', ' '], ['Space3', '3', '130 Mbit/s', '100', ' '], ['Space2', '6', '130 Mbit/s', '75', '*'],['Tolik', '8', '270 Mbit/s', '42', ' ']]
 			session["output_list"] = outputList
 
@@ -109,8 +112,6 @@ def networks():
 				else:
 					flash('Connection error!')
 					return redirect("/networks")
-				# print('nmcli dev wifi connect ' + session["output_list"][int(button)-1][0] + ' 
-class wifiNetworks password ' + passwd)
 			else:
 				flash('You must provide a password!')
 				# return redirect("/")
@@ -119,12 +120,8 @@ class wifiNetworks password ' + passwd)
 
 
 def stdoutParse(stdout):
-
-	# stdout = stdout[:-1]
-
 	outputList = []
 	string = ''
-
 	for n in stdout:
 		if n != 10:	# End of line
 			string += chr(n)
@@ -136,13 +133,16 @@ def stdoutParse(stdout):
 
 def stdoutParse1(stdout):
 	arr = []
+	string = ''
 	for n in stdout:
 		if n != 10:	# End of line
 			string += chr(n)
 		else:
 			s = string.split(":")
-			wifi1 = WifiNetwork(s[0], s[1], s[2], s[3])
-			arr.append(wifi1)
+			print(s)
+			wifi = WifiNetwork(s[0], s[1], s[2], s[3])
+			arr.append(wifi)
+			print(wifi)
 			string = ''
 	return arr
 

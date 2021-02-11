@@ -2,9 +2,7 @@
 {% block title %} Main {% endblock %}
 
 	{% block main %}
-        <div class="float-left">
-            <h3 class="display-5 text-success">{{ wan }}</h3>
-        </div>
+        <h3 class="float-left display-5 text-success">{{ wan }}</h3>
 		<div class="jumbotron py-1">
             <h3 class="display-5 text-success">Connected to: {{ currentconn }}</h3>
             <form class="my-2 my-lg-2" action="/" method="POST">
