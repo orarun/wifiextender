@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="static/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/favicon.ico" rel="icon">
+        <link href="/static/styles.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>WiFi Extender: {% block title %}{% endblock %}</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <span class="navbar-brand mb-0 h1 blue"><a href="/">WiFi Extender</a></span>
+        </nav>
+
+        {% if get_flashed_messages() %}
+        <header>
+            <div class="alert alert-primary border text-center" role="alert">
+                {{ get_flashed_messages() | join(" ") }}
+            </div>
+        </header>
+        {% endif %}
+
+        <main class="p-1">
+
+            {% block main %}{% endblock %}
+
+        </main>
+
+        <footer class="small text-center text-muted">
+            I'm footer :)
+        </footer>
+    </body>
+</html>
