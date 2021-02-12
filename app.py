@@ -19,6 +19,8 @@ class WifiNetwork:
 	def connect(self, passwd):
 		connect = subprocess.check_output('nmcli dev wifi connect ' + self.ssid + ' password ' + passwd, text=True, shell=True)
 		
+	def __str__(self):
+		return f"SSID: {self.ssid}"
 
 def getMyAP():
 	# reading local SSID from config file /etc/hostapd/hostapd.conf
