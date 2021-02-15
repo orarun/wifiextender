@@ -78,8 +78,8 @@ def networks():
 			output = output[:-1]
 
 			outputList = stdoutParse(output)
-			wifiList = stdoutParse1(output)
-			print(wifiList)
+			#wifiList = stdoutParse1(output)
+			#print(wifiList)
 		#outputList = [['YourAPSSID', '1', '65 Mbit/s', '100', ' '], ['Space3', '3', '130 Mbit/s', '100', ' '], ['Space2', '6', '130 Mbit/s', '75', '*'],['Tolik', '8', '270 Mbit/s', '42', ' ']]
 			session["output_list"] = outputList
 
@@ -101,8 +101,8 @@ def networks():
 				connect = None
 				error = False
 				try:
-					WifiNetwork.connect(passwd)
-					#connect = subprocess.check_output('nmcli dev wifi connect ' + session["output_list"][int(button)-1][0] + ' password ' + passwd, text=True, shell=True)
+					#WifiNetwork.connect(passwd)
+					connect = subprocess.check_output('nmcli dev wifi connect ' + session["output_list"][int(button)-1][0] + ' password ' + passwd, text=True, shell=True)
 				except:
 					error = True
 				else:
@@ -141,8 +141,8 @@ def stdoutParse1(stdout):
 			string += chr(n)
 		else:
 			s = string.split(":")
-			print(s)
-			wifi = WifiNetwork(s[0], s[1], s[2], s[3])
+			#print(s)
+			#wifi = WifiNetwork(s[0], s[1], s[2], s[3])
 			arr.append(wifi)
 			print(wifi)
 			string = ''
