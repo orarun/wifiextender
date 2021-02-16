@@ -2,7 +2,11 @@
 {% block title %} Main {% endblock %}
 
 	{% block main %}
-        <h3 class="float-left display-5 text-success">{{ wan }}</h3>
+        <div class="row g-3 pt-2">
+            <div class="col-sm-2">
+                <h3 class="display-5 text-warning">Internet</h3>
+            </div>
+        </div>
         <div class="jumbotron p-1">
             <form class="my-2 my-lg-2" action="/networks" method="POST">
                 <button class="btn btn-primary btn-lg" type="submit" value="Rescan" name="button">Rescan</button>
@@ -55,7 +59,11 @@
             {% endif %}
 		</div>
 		
-        <h3 class="float-left display-5 text-success">{{ lan }}</h3>
+        <div class="row g-3">
+            <div class="col-sm-3">
+                <h3 class="display-5 text-warning">Local network</h3>
+            </div>
+        </div>
         <div class="jumbotron py-2">
 			<div class="form-group my-1 my-lg-1 table-responsive">
                 <p>Leased addresses for local clients</p>

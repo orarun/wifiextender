@@ -37,11 +37,11 @@ def index():
 		session["wan_connection_successfull"] = False
 		# session["rescan"] = False
 
-		wan, lan, statusList = getNetworkInterfaces()
+		# wan, lan, statusList = getNetworkInterfaces()
 		clients = wifiClients()
 		currentConn = getCurrentConn()
 
-		return render_template("main.html", wan=wan, lan=lan, clients=clients, myap=myAP, currentconn=currentConn)
+		return render_template("main.html", clients=clients, myap=myAP, currentconn=currentConn)
 		
 	else:
 		# If "Disconnect" button has been pressed then disconnect from current wifi connection and purge all saved wifi networks
@@ -53,7 +53,7 @@ def index():
 		error = False
 
 		try:
-			disconnect = subprocess.check_output("qqqnmcli --fields NAME -t connection show | grep -v Wired | xargs -I «{}» nmcli connection delete «{}»", shell=True)
+			disconnect = subprocess.check_output("nmcli --fields NAME -t connection show | grep -v Wired | xargs -I «{}» nmcli connection delete «{}»", shell=True)
 		except subprocess.CalledProcessError as disconnectexc:
 			print("error code " + disconnectexc.output)
 			return redirect("/")

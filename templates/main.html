@@ -2,13 +2,18 @@
 {% block title %} Main {% endblock %}
 
 	{% block main %}
-        <h3 class="float-left display-5 text-success">{{ wan }}</h3>
+        <div class="row g-3 pt-2">
+            <div class="col-sm-2">
+                <h3 class="display-5 text-warning">Internet</h3>
+            </div>
+        </div>
 		<div class="jumbotron py-1">
             <h3 class="display-5 text-success">Connected to: {{ currentconn }}</h3>
-            <form class="my-2 my-lg-2" action="/" method="POST">
+            <form class="my-lg-2" action="/" method="POST">
 				<button class="btn btn-primary btn-lg" type="submit" value="Disconnect" name="button">Disconnect</button>
             </form>
-			<form class="my-2 my-lg-2" action="/" method="POST">
+            <hr class="my-4">
+			<form class="my-lg-2" action="/" method="POST">
 				<button class="btn btn-primary btn-lg" type="submit" value="Scan" name="button">Scan</button>
             </form>
 			<div>
@@ -16,7 +21,11 @@
 			</div>
 		</div>
 
-        <h3 class="float-left display-5 text-success">{{ lan }}</h3>
+        <div class="row g-3">
+            <div class="col-sm-3">
+                <h3 class="display-5 text-warning">Local network</h3>
+            </div>
+        </div>
 		<div class="jumbotron py-2">
             <h3 class="display-5 text-success">Local WiFi: {{ myap }}</h3>			
 			<div class="form-group">
