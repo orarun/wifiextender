@@ -22,6 +22,10 @@ class WifiNetwork:
 	def __str__(self):
 		return f"SSID: {self.ssid}"
 
+# class WifiNetworks:
+# 	def __init__(self):
+
+
 def getMyAP():
 	# reading local SSID from config file /etc/hostapd/hostapd.conf
 	with open('/etc/hostapd/hostapd.conf', 'r') as file:
@@ -55,7 +59,7 @@ def index():
 		try:
 			disconnect = subprocess.check_output("nmcli --fields NAME -t connection show | grep -v Wired | xargs -I «{}» nmcli connection delete «{}»", shell=True)
 		except subprocess.CalledProcessError as disconnectexc:
-			print("error code " + disconnectexc.output)
+			# print("error code " + disconnectexc.output)
 			return redirect("/")
 		else:
 			flash('Successfully disconnected!')
@@ -79,7 +83,7 @@ def networks():
 
 			outputList = stdoutParse(output)
 
-			#wifiList = stdoutParse1(output)
+			wifiList = stdoutParse1(output)
 			#print(wifiList)
 
 		#outputList = [['YourAPSSID', '1', '65 Mbit/s', '100', ' '], ['Space3', '3', '130 Mbit/s', '100', ' '], ['Space2', '6', '130 Mbit/s', '75', '*'],['Tolik', '8', '270 Mbit/s', '42', ' ']]
@@ -90,7 +94,7 @@ def networks():
 		currentConn = getCurrentConn()
 
 		# /sys/class/net/
-		return render_template("networks.html", myAP=myAP, currentConn=currentConn, error=error, outputList=outputList, wan=wan, lan=lan, clients = wifiClients())
+		return render_template("networks.html", myap=myAP, currentConn=currentConn, error=error, outputList=outputList, wan=wan, lan=lan, clients = wifiClients())
 
 	else:
 		# If "Rescan" button has been pressed then rescan wifi networks
@@ -103,36 +107,35 @@ def networks():
 				connect = None
 				error = False
 
-				for n in wifiList:
-					if session["output_list"][int(button)-1][0] == n.ssid:
-						try:
-							connect = n.connect(passwd)
-						except:
-							error = True
-						else:
-							connect = connect[:-1]
-						if connect.find('successfully') != -1:
-							flash('Successfully connected!')
-							session["wan_connection_successfull"] = True
-							return redirect("/")
-				# try:
-				# 	WifiNetwork.connect(passwd)
-				# 	#connect = subprocess.check_output('nmcli dev wifi connect ' + session["output_list"][int(button)-1][0] + ' password ' + passwd, text=True, shell=True)
-				# except:
-				# 	error = True
-				# else:
-				# 	connect = connect[:-1]
-				# if connect.find('successfully') != -1:
-				# 	flash('Successfully connected!')
-				# 	session["wan_connection_successfull"] = True
-				# 	return redirect("/")
+				# for n in wifiList:
+				# 	if session["output_list"][int(button)-1][0] == n.ssid:
+				# 		try:
+				# 			connect = n.connect(passwd)
+				# 		except:
+				# 			error = True
+				# 		else:
+				# 			connect = connect[:-1]
+				# 		if connect.find('successfully') != -1:
+				# 			flash('Successfully connected!')
+				# 			session["wan_connection_successfull"] = True
+				# 			return redirect("/")
+				try:
+					# WifiNetwork.connect(passwd)
+					connect = subprocess.check_output('nmcli dev wifi connect ' + session["output_list"][int(button)-1][0] + ' password ' + passwd, text=True, shell=True)
+				except:
+					error = True
+				else:
+					connect = connect[:-1]
+				if connect.find('successfully') != -1:
+					flash('Successfully connected!')
+					session["wan_connection_successfull"] = True
+					return redirect("/")
 
 				else:
 					flash('Connection error!')
 					return redirect("/networks")
 			else:
 				flash('You must provide a password!')
-				# return redirect("/")
 			
 			return redirect("/networks")
 
@@ -158,9 +161,9 @@ def stdoutParse1(stdout):
 		else:
 			s = string.split(":")
 			#print(s)
-			#wifi = WifiNetwork(s[0], s[1], s[2], s[3])
+			wifi = WifiNetwork(s[0], s[1], s[2], s[3])
 			arr.append(wifi)
-			print(wifi)
+			#print(wifi)
 			string = ''
 	return arr
 
