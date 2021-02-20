@@ -32,7 +32,7 @@ def getMyAP():
 		for line in file:
 			if line[:5] == "ssid=":
 				return line[5:-1]
-myAP = getMyAP()
+myap = getMyAP()
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -45,7 +45,7 @@ def index():
 		clients = wifiClients()
 		currentConn = getCurrentConn()
 
-		return render_template("main.html", clients=clients, myap=myAP, currentconn=currentConn)
+		return render_template("main.html", clients=clients, myap=myap, currentconn=currentConn)
 		
 	else:
 		# If "Disconnect" button has been pressed then disconnect from current wifi connection and purge all saved wifi networks
@@ -54,7 +54,7 @@ def index():
 			return redirect("/networks")
 		
 		#disconnect = None
-		error = False
+		#error = False
 
 		try:
 			disconnect = subprocess.check_output("nmcli --fields NAME -t connection show | grep -v Wired | xargs -I «{}» nmcli connection delete «{}»", shell=True)
@@ -94,7 +94,7 @@ def networks():
 		currentConn = getCurrentConn()
 
 		# /sys/class/net/
-		return render_template("networks.html", myap=myAP, currentConn=currentConn, error=error, outputList=outputList, wan=wan, lan=lan, clients = wifiClients())
+		return render_template("networks.html", myap=myap, currentConn=currentConn, error=error, outputList=outputList, wan=wan, lan=lan, clients = wifiClients())
 
 	else:
 		# If "Rescan" button has been pressed then rescan wifi networks
@@ -122,6 +122,7 @@ def networks():
 				try:
 					# WifiNetwork.connect(passwd)
 					connect = subprocess.check_output('nmcli dev wifi connect ' + session["output_list"][int(button)-1][0] + ' password ' + passwd, text=True, shell=True)
+					print(connect)
 				except:
 					error = True
 				else:
@@ -130,7 +131,6 @@ def networks():
 					flash('Successfully connected!')
 					session["wan_connection_successfull"] = True
 					return redirect("/")
-
 				else:
 					flash('Connection error!')
 					return redirect("/networks")
