@@ -9,18 +9,18 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-class WifiNetwork:
-	def __init__(self, ssid, ch, rate, signal):
-		self.ssid = ssid
-		self.ch = ch
-		self.rate = rate
-		self.signal = signal
+# class WifiNetwork:
+# 	def __init__(self, ssid, ch, rate, signal):
+# 		self.ssid = ssid
+# 		self.ch = ch
+# 		self.rate = rate
+# 		self.signal = signal
 
-	def connect(self, passwd):
-		connect = subprocess.check_output('nmcli dev wifi connect ' + self.ssid + ' password ' + passwd, text=True, shell=True)
+# 	def connect(self, passwd):
+# 		connect = subprocess.check_output('nmcli dev wifi connect ' + self.ssid + ' password ' + passwd, text=True, shell=True)
 		
-	def __str__(self):
-		return f"SSID: {self.ssid}"
+# 	def __str__(self):
+# 		return f"SSID: {self.ssid}"
 
 # class WifiNetworks:
 # 	def __init__(self):
@@ -83,7 +83,7 @@ def networks():
 
 			outputList = stdoutParse(output)
 
-			wifiList = stdoutParse1(output)
+			# wifiList = stdoutParse1(output)
 			#print(wifiList)
 
 		#outputList = [['YourAPSSID', '1', '65 Mbit/s', '100', ' '], ['Space3', '3', '130 Mbit/s', '100', ' '], ['Space2', '6', '130 Mbit/s', '75', '*'],['Tolik', '8', '270 Mbit/s', '42', ' ']]
@@ -94,6 +94,7 @@ def networks():
 		currentConn = getCurrentConn()
 
 		# /sys/class/net/
+		# print(outputList)
 		return render_template("networks.html", myap=myap, currentConn=currentConn, error=error, outputList=outputList, wan=wan, lan=lan, clients = wifiClients())
 
 	else:
@@ -122,7 +123,7 @@ def networks():
 				try:
 					# WifiNetwork.connect(passwd)
 					connect = subprocess.check_output('nmcli dev wifi connect ' + session["output_list"][int(button)-1][0] + ' password ' + passwd, text=True, shell=True)
-					print(connect)
+					# print(connect)
 				except:
 					error = True
 				else:
@@ -152,20 +153,20 @@ def stdoutParse(stdout):
 			string = ''
 	return outputList
 
-def stdoutParse1(stdout):
-	arr = []
-	string = ''
-	for n in stdout:
-		if n != 10:	# End of line
-			string += chr(n)
-		else:
-			s = string.split(":")
-			#print(s)
-			wifi = WifiNetwork(s[0], s[1], s[2], s[3])
-			arr.append(wifi)
-			#print(wifi)
-			string = ''
-	return arr
+# def stdoutParse1(stdout):
+# 	arr = []
+# 	string = ''
+# 	for n in stdout:
+# 		if n != 10:	# End of line
+# 			string += chr(n)
+# 		else:
+# 			s = string.split(":")
+# 			#print(s)
+# 			wifi = WifiNetwork(s[0], s[1], s[2], s[3])
+# 			arr.append(wifi)
+# 			#print(wifi)
+# 			string = ''
+# 	return arr
 
 
 def getNetworkInterfaces():
@@ -257,16 +258,16 @@ def getCurrentConn():
 			return currentConn
 
 
-def apology(message, code=400):
-    """Render message as an apology to user."""
-    def escape(s):
-        """
-        Escape special characters.
+# def apology(message, code=400):
+#     """Render message as an apology to user."""
+#     def escape(s):
+#         """
+#         Escape special characters.
 
-        https://github.com/jacebrowning/memegen#special-characters
-        """
-        for old, new in [("-", "--"), (" ", "-"), ("_", "__"), ("?", "~q"),
-                         ("%", "~p"), ("#", "~h"), ("/", "~s"), ("\"", "''")]:
-            s = s.replace(old, new)
-        return s
-    return render_template("apology.html", top=code, bottom=escape(message)), code
+#         https://github.com/jacebrowning/memegen#special-characters
+#         """
+#         for old, new in [("-", "--"), (" ", "-"), ("_", "__"), ("?", "~q"),
+#                          ("%", "~p"), ("#", "~h"), ("/", "~s"), ("\"", "''")]:
+#             s = s.replace(old, new)
+#         return s
+#     return render_template("apology.html", top=code, bottom=escape(message)), code
