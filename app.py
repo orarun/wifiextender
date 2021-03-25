@@ -9,61 +9,52 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# class WifiNetwork:
-# 	def __init__(self, ssid, ch, rate, signal):
-# 		self.ssid = ssid
-# 		self.ch = ch
-# 		self.rate = rate
-# 		self.signal = signal
-
-# 	def connect(self, passwd):
-# 		connect = subprocess.check_output('nmcli dev wifi connect ' + self.ssid + ' password ' + passwd, text=True, shell=True)
-		
-# 	def __str__(self):
-# 		return f"SSID: {self.ssid}"
-
-# class WifiNetworks:
-# 	def __init__(self):
-
 
 def getMyAP():
-	# reading local SSID from config file /etc/hostapd/hostapd.conf
+	# reading local SSID from which is hardcoded in config file /etc/hostapd/hostapd.conf
 	with open('/etc/hostapd/hostapd.conf', 'r') as file:
 		for line in file:
 			if line[:5] == "ssid=":
 				return line[5:-1]
+
+# Variable which contain of a name of the device's Access Point (Local WiFi network)
 myap = getMyAP()
 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
 	if request.method == "GET":
-		session["wan_connection_successfull"] = False
-		# session["rescan"] = False
 
-		# wan, lan, statusList = getNetworkInterfaces()
+		# Set wan_connection_successfull cookie to False
+		session["wan_connection_successfull"] = False
+
+		# Client connected to the device
 		clients = wifiClients()
+
+		# Get a wifi network the device is currently connected to
 		currentConn = getCurrentConn()
 
 		return render_template("main.html", clients=clients, myap=myap, currentconn=currentConn)
 		
 	else:
-		# If "Disconnect" button has been pressed then disconnect from current wifi connection and purge all saved wifi networks
+		# If "Disconnect" button has been pressed then the device disconnects from current wifi and purge all saved wifi networks
 		button = request.form['button']
+
+		# If "Scan" button has been pressed then we redirect to the /networks route
 		if button == "Scan":
 			return redirect("/networks")
-		
-		#disconnect = None
-		#error = False
 
+		# Get an output of the "nmcli" command
 		try:
 			disconnect = subprocess.check_output("nmcli --fields NAME -t connection show | grep -v Wired | xargs -I «{}» nmcli connection delete «{}»", shell=True)
 		except subprocess.CalledProcessError as disconnectexc:
-			# print("error code " + disconnectexc.output)
 			return redirect("/")
 		else:
+
+			# Set wan_disconnection_successfull cookie to True to show a flash message on the page
 			flash('Successfully disconnected!')
 			session["wan_disconnection_successfull"] = True
+
 		return redirect("/")
 
 
@@ -71,31 +62,34 @@ def index():
 def networks():
 	if request.method == "GET":
 
+		# List of available wifi networks
 		outputList = None
 		error = False
+
+		# Get an output of the "nmcli" command
 		try:
 			output = subprocess.check_output("nmcli -t -f SSID,CHAN,RATE,SIGNAL,IN-USE dev wifi", shell=True)
 		except:
 			error = True
 		else:
-			# Delete last empty string of the output
+			# Delete last empty string of the output as it is just a new line
 			output = output[:-1]
 
+			# Parse output to get a list of wifi networks
 			outputList = stdoutParse(output)
 
-			# wifiList = stdoutParse1(output)
-			#print(wifiList)
+		### Sample of output list of WiFi networks
+		### [['YourAPSSID', '1', '65 Mbit/s', '100', ' '], ['Space3', '3', '130 Mbit/s', '100', ' '], ['Space2', '6', '130 Mbit/s', '75', '*'],['Tolik', '8', '270 Mbit/s', '42', ' ']]
 
-		#outputList = [['YourAPSSID', '1', '65 Mbit/s', '100', ' '], ['Space3', '3', '130 Mbit/s', '100', ' '], ['Space2', '6', '130 Mbit/s', '75', '*'],['Tolik', '8', '270 Mbit/s', '42', ' ']]
+			# Store output_list to cookie to send it to the "network" page
 			session["output_list"] = outputList
 
-		wan, lan, statusList = getNetworkInterfaces()
+
+		# wan, lan, statusList = getNetworkInterfaces()
 		clients = wifiClients()
 		currentConn = getCurrentConn()
 
-		# /sys/class/net/
-		# print(outputList)
-		return render_template("networks.html", myap=myap, currentConn=currentConn, error=error, outputList=outputList, wan=wan, lan=lan, clients = wifiClients())
+		return render_template("networks.html", myap=myap, currentConn=currentConn, error=error, outputList=outputList, clients = wifiClients())
 
 	else:
 		# If "Rescan" button has been pressed then rescan wifi networks
@@ -103,32 +97,22 @@ def networks():
 		if button == "Rescan":
 			return redirect("/networks")
 		else:
+			# Else we assume that we get a password. So, try to connect to the wifi network with the given passowrd
 			passwd = request.form.get("passwd")
 			if passwd != '':
 				connect = None
 				error = False
 
-				# for n in wifiList:
-				# 	if session["output_list"][int(button)-1][0] == n.ssid:
-				# 		try:
-				# 			connect = n.connect(passwd)
-				# 		except:
-				# 			error = True
-				# 		else:
-				# 			connect = connect[:-1]
-				# 		if connect.find('successfully') != -1:
-				# 			flash('Successfully connected!')
-				# 			session["wan_connection_successfull"] = True
-				# 			return redirect("/")
+				# Get an output of the "nmcli" command
 				try:
-					# WifiNetwork.connect(passwd)
 					connect = subprocess.check_output('nmcli dev wifi connect ' + session["output_list"][int(button)-1][0] + ' password ' + passwd, text=True, shell=True)
-					# print(connect)
 				except:
 					error = True
 				else:
 					connect = connect[:-1]
 				if connect.find('successfully') != -1:
+
+					# Set wan_connection_successfull cookie to True to show a flash message on the page
 					flash('Successfully connected!')
 					session["wan_connection_successfull"] = True
 					return redirect("/")
@@ -142,54 +126,42 @@ def networks():
 
 
 def stdoutParse(stdout):
+# Parse of the scan output 
 	outputList = []
 	string = ''
 	for n in stdout:
 		if n != 10:	# End of line
 			string += chr(n)
 		else:
+			# Delimeter of the items is ":"
 			s = string.split(":")
 			outputList.append(s)
 			string = ''
 	return outputList
 
-# def stdoutParse1(stdout):
-# 	arr = []
-# 	string = ''
-# 	for n in stdout:
-# 		if n != 10:	# End of line
-# 			string += chr(n)
-# 		else:
-# 			s = string.split(":")
-# 			#print(s)
-# 			wifi = WifiNetwork(s[0], s[1], s[2], s[3])
-# 			arr.append(wifi)
-# 			#print(wifi)
-# 			string = ''
-# 	return arr
 
+# def getNetworkInterfaces():
+# 	# Get network interfaces of the device
+# 	interfaces = subprocess.check_output("ls /sys/class/net/", text=True, shell=True)
+# 	interfaces = interfaces[:-1]
 
-def getNetworkInterfaces():
-	interfaces = subprocess.check_output("ls /sys/class/net/", text=True, shell=True)
-	interfaces = interfaces[:-1]
+# 	status = subprocess.check_output('nmcli -t dev status', shell=True)
 
-	status = subprocess.check_output('nmcli -t dev status', shell=True)
+# 	# Delete last empty string of the output
+# 	status = status[:-1]
 
-	# Delete last empty string of the output
-	status = status[:-1]
+# 	statusList = stdoutParse(status)
 
-	statusList = stdoutParse(status)
+# 	if (interfaces.find('wlan0') != -1):
+# 		wan = "Internet: wlan0"
+# 	else:
+# 		wan = "Internet: Interface not found"
+# 	if (interfaces.find('wlan1') != -1):
+# 		lan = "Local: wlan1"
+# 	else:
+# 		lan = "Local: Interface not found"
 
-	if (interfaces.find('wlan0') != -1):
-		wan = "Internet: wlan0"
-	else:
-		wan = "Internet: Interface not found"
-	if (interfaces.find('wlan1') != -1):
-		lan = "Local: wlan1"
-	else:
-		lan = "Local: Interface not found"
-
-	return (wan, lan, statusList)
+# 	return (wan, lan, statusList)
 
 def wifiClients():
 	dhcpLeases = []
@@ -236,15 +208,18 @@ def wifiClients():
 				dhcpLeases[idx].append(line[19:(len(line)-3)])
 				clientHostname = True
 
-		# If we didn't find hostname for last IP in the file we put "none" to the list
+		# If we didn't find a hostname for the last IP in the file, we put "none" to the list
 		if not clientHostname:
 			dhcpLeases[idx].append("none")
 	return dhcpLeases
 
 
 def getCurrentConn():
+		# Get a wifi network the device is currently connected to
 		currentConn = None
 		error = False
+
+		# Get an output of the "nmcli" command
 		try:
 			output = subprocess.check_output("nmcli -t connection show --active | grep wlan0", shell=True)
 		except:
@@ -252,22 +227,8 @@ def getCurrentConn():
 		else:
 			currentConn = stdoutParse(output)
 
+		# If the device is connected to any wifi network then we return a name of that network
 		if currentConn is not None:
 			return currentConn[0][0]
 		else:
 			return currentConn
-
-
-# def apology(message, code=400):
-#     """Render message as an apology to user."""
-#     def escape(s):
-#         """
-#         Escape special characters.
-
-#         https://github.com/jacebrowning/memegen#special-characters
-#         """
-#         for old, new in [("-", "--"), (" ", "-"), ("_", "__"), ("?", "~q"),
-#                          ("%", "~p"), ("#", "~h"), ("/", "~s"), ("\"", "''")]:
-#             s = s.replace(old, new)
-#         return s
-#     return render_template("apology.html", top=code, bottom=escape(message)), code
