@@ -11,7 +11,7 @@ Session(app)
 
 
 def getMyAP():
-	# reading local SSID from which is hardcoded in config file /etc/hostapd/hostapd.conf
+	# reading local SSID from a config file /etc/hostapd/hostapd.conf
 	with open('/etc/hostapd/hostapd.conf', 'r') as file:
 		for line in file:
 			if line[:5] == "ssid=":
