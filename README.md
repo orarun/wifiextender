@@ -43,7 +43,7 @@ In main file I have the functions below:
 
 ## Installation of the OS
 
-To install an OS on the NanoPi Neo ARM board I used [this website] (http://wiki.friendlyarm.com/wiki/index.php/NanoPi_NEO#Get_Started)
+To install an OS on the NanoPi Neo ARM board I used [this website](http://wiki.friendlyarm.com/wiki/index.php/NanoPi_NEO#Get_Started).
 
 ## Configuring the OS
 
@@ -63,21 +63,17 @@ Capabilities:
 Typical uses include:
 *Scripts:* Utilize NetworkManager via nmcli instead of managing network connections manually. nmcli supports a terse output format which is better suited for script processing. NetworkManager can also execute scripts, called "dispatcher scripts", in response to network events. 
 *Servers*, headless machines, and terminals: nmcli can be used to control NetworkManager without a GUI, including creating, editing, starting and stopping network connections and viewing network status.
-- **supervisor** - is a client/server system that allows its users to control a number of processes on UNIX-like operating systems. It was inspired by the following:
-*Convenience*. It is often inconvenient to need to write rc.d scripts for every single process instance. rc.d scripts are a great lowest-common-denominator form of process initialization/autostart/management, but they can be painful to write and maintain. Additionally, rc.d scripts cannot automatically restart a crashed process and many programs do not restart themselves properly on a crash. Supervisord starts processes as its subprocesses, and can be configured to automatically restart them on a crash. It can also automatically be configured to start processes on its own invocation.
-
-*Accuracy*. It’s often difficult to get accurate up/down status on processes on UNIX. Pidfiles often lie. Supervisord starts processes as subprocesses, so it always knows the true up/down status of its children and can be queried conveniently for this data.
-
-*Delegation*. Users who need to control process state often need only to do that. They don’t want or need full-blown shell access to the machine on which the processes are running. Processes which listen on “low” TCP ports often need to be started and restarted as the root user (a UNIX misfeature). It’s usually the case that it’s perfectly fine to allow “normal” people to stop or restart such a process, but providing them with shell access is often impractical, and providing them with root access or sudo access is often impossible. It’s also (rightly) difficult to explain to them why this problem exists. If supervisord is started as root, it is possible to allow “normal” users to control such processes without needing to explain the intricacies of the problem to them. Supervisorctl allows a very limited form of access to the machine, essentially allowing users to see process status and control supervisord-controlled subprocesses by emitting “stop”, “start”, and “restart” commands from a simple shell or web UI.
-
-*Process Groups*. Processes often need to be started and stopped in groups, sometimes even in a “priority order”. It’s often difficult to explain to people how to do this. Supervisor allows you to assign priorities to processes, and allows user to emit commands via the supervisorctl client like “start all”, and “restart all”, which starts them in the preassigned priority order. Additionally, processes can be grouped into “process groups” and a set of logically related processes can be stopped and started as a unit.
+- **supervisor** - is a client/server system that allows its users to control a number of processes on UNIX-like operating systems. It was inspired by the following:<br><br>
+*Convenience*. It is often inconvenient to need to write rc.d scripts for every single process instance. rc.d scripts are a great lowest-common-denominator form of process initialization/autostart/management, but they can be painful to write and maintain. Additionally, rc.d scripts cannot automatically restart a crashed process and many programs do not restart themselves properly on a crash. Supervisord starts processes as its subprocesses, and can be configured to automatically restart them on a crash. It can also automatically be configured to start processes on its own invocation.<br><br>
+*Accuracy*. It’s often difficult to get accurate up/down status on processes on UNIX. Pidfiles often lie. Supervisord starts processes as subprocesses, so it always knows the true up/down status of its children and can be queried conveniently for this data.<br><br>
+*Delegation*. Users who need to control process state often need only to do that. They don’t want or need full-blown shell access to the machine on which the processes are running. Processes which listen on “low” TCP ports often need to be started and restarted as the root user (a UNIX misfeature). It’s usually the case that it’s perfectly fine to allow “normal” people to stop or restart such a process, but providing them with shell access is often impractical, and providing them with root access or sudo access is often impossible. It’s also (rightly) difficult to explain to them why this problem exists. If supervisord is started as root, it is possible to allow “normal” users to control such processes without needing to explain the intricacies of the problem to them. Supervisorctl allows a very limited form of access to the machine, essentially allowing users to see process status and control supervisord-controlled subprocesses by emitting “stop”, “start”, and “restart” commands from a simple shell or web UI.<br><br>
+*Process Groups*. Processes often need to be started and stopped in groups, sometimes even in a “priority order”. It’s often difficult to explain to people how to do this. Supervisor allows you to assign priorities to processes, and allows user to emit commands via the supervisorctl client like “start all”, and “restart all”, which starts them in the preassigned priority order. Additionally, processes can be grouped into “process groups” and a set of logically related processes can be stopped and started as a unit.<br><br>
 
 ## Description
 
-In this project I use two wireless adapters, **wlan0** and **wlan1**. wlan0 is used for connection the device to the Internet via available WiFi network and wlan1 is used as an interface where local clients will have to connected to.
+In this project I use two wireless adapters, **wlan0** and **wlan1**. **wlan0** is used for connection the device to the Internet via available WiFi network and **wlan1** is used as an interface where local clients will have to connected to.
 
-To connect to the Internet via device it is also required to configure routing and firewall.
-To configure the device for getting Internet I used the website 
+To connect to the Internet via device it is also required to configure routing and firewall. To configure the device for getting Internet I used the [website](http://raspberry-at-home.com/hotspot-wifi-access-point).
 
 For the application to start correctly, a certain daemons startup order required as, for instance, "isc-dhcp-server" daemon requires that a network interface should be already configured and started before the daemon. To the "/etc/rc.local" I added the code below:
 
@@ -90,6 +86,7 @@ systemctl start wpa_supplicant
 systemctl start isc-dhcp-server
 systemctl restart hostapd
 ```
+<br>
 
 ## How the device works
 
@@ -110,6 +107,7 @@ So, first I have to connect to the local WiFi network of my device and open main
 To see which WiFi networks are available now I press the *Scan* button and wait for 5-10 seconds when our External adapter scans for WiFi networks. After that I will be redirected to the **networks.html** page with the available networks and be able to choose any  WiFi network and connect it. On this page I also have two sections, "Internet" and "Local network". But in this time, in the "Internet" section there is a list of available WiFi networks. In the "Local network" section there is the same information about leased IPs for local clients.<br><br>
 
 To connect to one of the WiFi network I must input a password to "Password" field. Usually, for security, when we input a passwords they we see asterisks instead of the actual characters in our password but in my case, I consciously left a password visible as I plan to get a password from hotels staff and I do not need to hide it from someone. And also I do not need to make my application more complex, like add sections with "Show password" marks.
+<br>
 
 ## Design
 
@@ -117,7 +115,6 @@ This app is also has a responsive design and good looks on a mobile phone as I a
 ```
 <meta name="viewport" content="width=device-width, initial-scale=1">
 ```
-
 
 ### **Thanks**
 Thank you CS50 team and personal David and Brian! You are really good teachers who can explain difficult things with simple words.
