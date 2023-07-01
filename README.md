@@ -43,11 +43,12 @@ In main file I have the functions below:
 
 ## Installation of the OS
 
-To install an OS on the NanoPi Neo ARM board I used [this website](http://wiki.friendlyarm.com/wiki/index.php/NanoPi_NEO#Get_Started).
+To install an OS on the NanoPi Neo ARM board I used [this image](https://mirrors.dotsrc.org/armbian-dl/nanopineo/archive/Armbian_23.5.2_Nanopineo_jammy_current_6.1.30.img.xz)
+http://wiki.friendlyarm.com/wiki/index.php/NanoPi_NEO#Get_Started.
 
 ## Configuring the OS
 
-After OS is installed we need configure a number of packages. The WiFi Extender is a web application written in Python, HTML, Flask and Sipervisor and working on the NanoPi Neo ARM. For my project I used OS Armbian 20.11.6 Buster, Python 3.7.3, Flask 1.1.2. and Supervisor 3.3.5-1.
+After OS is installed we need configure a number of packages. The WiFi Extender is a web application written in Python, HTML, Flask and Sipervisor and working on the NanoPi Neo ARM. For my project I used OS Armbian 20.11.6 Buster (old one and new is 22.04.2 LTS (Jammy Jellyfish)), Python 3.7.3, Flask 1.1.2. and Supervisor 3.3.5-1.
 
 To configure the OS for my project I used the packages below:
 
@@ -71,9 +72,14 @@ Typical uses include:
 
 ## Description
 
-In this project I use two wireless adapters, **wlan0** and **wlan1**. **wlan0** is used for connection the device to the Internet via available WiFi network and **wlan1** is used as an interface where local clients will have to connected to.
+In this project I use two wireless adapters, **wlan0** and **wlan1**. **wlan0** is used as WAN interface for connection the device to the Internet via available WiFi network and **wlan1** is used as WLAN interface for local clients.
 
 To connect to the Internet via device it is also required to configure routing and firewall. To configure the device for getting Internet I used the [website](http://raspberry-at-home.com/hotspot-wifi-access-point).
+
+To appoint wireless adapters static names based on their MAC addresses create a file /etc/udev/rules.d/70-persistent-net.rules and put here the following:
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="<put your wifi dongle wlan0 MAC address here>", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="wlan0"
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="<put your wifi dongle wlan1 MAC address here>", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="wlan1"
+(https://forum.armbian.com/topic/5167-orange-pi-zero-wifi-adapter-wlx20xxxxxxxxxx/)
 
 For the application to start correctly, a certain daemons startup order required as, for instance, "isc-dhcp-server" daemon requires that a network interface should be already configured and started before the daemon. To the "/etc/rc.local" I added the code below:
 
