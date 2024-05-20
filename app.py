@@ -1,5 +1,5 @@
 #import wifi
-# WLAN0 and WLAN1 are hardcoded to WAN and LAN accordingly
+# WLAN0 and WLAN1 are hardcoded to LAN and WAN accordingly
 import os, subprocess, requests, urllib.parse, ipaddress, re
 from flask import Flask, redirect, render_template, request, session, flash
 from flask_session import Session
@@ -43,6 +43,10 @@ def index():
 		# If "Scan" button has been pressed then we redirect to the /networks route
 		if button == "Scan":
 			return redirect("/networks")
+		
+		# If "PowerOFF" button has been pressed then shutdown the device
+		if button == "PowerOFF":
+			subprocess.check_output("shutdown -h now", shell=True)
 
 		# Get an output of the "nmcli" command
 		try:
@@ -152,8 +156,8 @@ def stdoutParse(stdout):
 
 # 	statusList = stdoutParse(status)
 
-# 	if (interfaces.find('wlan0') != -1):
-# 		wan = "Internet: wlan0"
+# 	if (interfaces.find('wlan1') != -1):
+# 		wan = "Internet: wlan1"
 # 	else:
 # 		wan = "Internet: Interface not found"
 # 	if (interfaces.find('wlan1') != -1):
@@ -221,7 +225,7 @@ def getCurrentConn():
 
 		# Get an output of the "nmcli" command
 		try:
-			output = subprocess.check_output("nmcli -t connection show --active | grep wlan0", shell=True)
+			output = subprocess.check_output("nmcli -t connection show --active | grep wlan1 | awk '{print $1}'", shell=True)
 		except:
 			error = True
 		else:

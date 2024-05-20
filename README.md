@@ -4,9 +4,10 @@
 
 ## Overview
 
-We, together with my family like travel abroad. And sometimes in the hotels where we rest, a WiFi signal is not so good. And I wanted to create a device which will has two WiFi adapters one of which, let's call it "External", will connect to the hotel WiFi and another adapter, let's call it "Local", provide a local WiFi network for my gadgets.
+We, together with my family like travel abroad. And sometimes in the hotels where we rest, a WiFi signal is not so good. And I wanted to create a device which will has two WiFi adapters one of which, let's call it "External", will connect to the hotel's WiFi and another adapter, let's call it "Local", provide a local WiFi network for my gadgets.
 
-I know, there are routers and repeaters which I can use for this purposes, but they take more space and I've had the NanoPi, two WiFi adapters and I got an idea for CS50 final project )
+I know, there are routers and repeaters which I can use for this purposes, but they take more space, can't use USB for power and I've had the NanoPi, two WiFi adapters and I got an idea for CS50 final project.
+
 
 ## Structure
 
@@ -41,14 +42,19 @@ In main file I have the functions below:
 **main.html** - the main page of the application. There are two sections on the page, "Internet" and "Local network". In the "Internet" section there is an information about WiFi network my device is currently connected to. And two buttons "Disconnect" and "Scan". In the "Local network" section there is an information about leased IPs that OS is provided for the device's local WiFi clients.<br>
 **networks.html** - the page with available networks. There are the same two sections on the page, "Internet" and "Local network". But in this time, in the "Internet" section there is a list of available WiFi networks. In the "Local network" section there is the same information about leased IPs for local clients.<br><br>
 
+
 ## Installation of the OS
 
-To install an OS on the NanoPi Neo ARM board I used [this image](https://mirrors.dotsrc.org/armbian-dl/nanopineo/archive/Armbian_23.5.2_Nanopineo_jammy_current_6.1.30.img.xz)
+[Here](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_NEO) you can choose an image which best fit your needs. I use h3_sd_friendlycore-xenial_4.14_armhf_20210618.img. More modern OSes I used previously https://mirrors.dotsrc.org/armbian-dl/nanopineo/archive/Armbian_23.5.2_Nanopineo_jammy_current_6.1.30.img.xz does not support GPIO at least I have no lucky to bring it up.
+Choose an apropriate image (if current one doesn't exist anymore) [here](https://www.armbian.com/nanopi-neo/)
 http://wiki.friendlyarm.com/wiki/index.php/NanoPi_NEO#Get_Started.
+
 
 ## Configuring the OS
 
-After OS is installed we need configure a number of packages. The WiFi Extender is a web application written in Python, HTML, Flask and Sipervisor and working on the NanoPi Neo ARM. For my project I used OS Armbian 20.11.6 Buster (old one and new is 22.04.2 LTS (Jammy Jellyfish)), Python 3.7.3, Flask 1.1.2. and Supervisor 3.3.5-1.
+For Ubuntu 22.04. After OS is installed we need configure a number of packages. To connect to Armbian OS via SSH for the first time please use "root" as a login and "1234" as a password.
+
+The WiFi Extender is a web application written in Python, HTML, Flask and Sipervisor and working on the NanoPi Neo ARM. For my project I used OS Armbian 20.11.6 Buster (old one and new is 22.04.2 LTS (Jammy Jellyfish)), Python 3.7.3, Flask 1.1.2. and Supervisor 3.3.5-1.
 
 To configure the OS for my project I used the packages below:
 
@@ -70,29 +76,67 @@ Typical uses include:
 *Delegation*. Users who need to control process state often need only to do that. They don’t want or need full-blown shell access to the machine on which the processes are running. Processes which listen on “low” TCP ports often need to be started and restarted as the root user (a UNIX misfeature). It’s usually the case that it’s perfectly fine to allow “normal” people to stop or restart such a process, but providing them with shell access is often impractical, and providing them with root access or sudo access is often impossible. It’s also (rightly) difficult to explain to them why this problem exists. If supervisord is started as root, it is possible to allow “normal” users to control such processes without needing to explain the intricacies of the problem to them. Supervisorctl allows a very limited form of access to the machine, essentially allowing users to see process status and control supervisord-controlled subprocesses by emitting “stop”, “start”, and “restart” commands from a simple shell or web UI.<br><br>
 *Process Groups*. Processes often need to be started and stopped in groups, sometimes even in a “priority order”. It’s often difficult to explain to people how to do this. Supervisor allows you to assign priorities to processes, and allows user to emit commands via the supervisorctl client like “start all”, and “restart all”, which starts them in the preassigned priority order. Additionally, processes can be grouped into “process groups” and a set of logically related processes can be stopped and started as a unit.<br><br>
 
+
 ## Description
 
-In this project I use two wireless adapters, **wlan0** and **wlan1**. **wlan0** is used as WAN interface for connection the device to the Internet via available WiFi network and **wlan1** is used as WLAN interface for local clients.
+In this project I use two wireless adapters, **wlan0** and **wlan1**. **wlan0** is used as WAN interface for connection device to the Internet via available WiFi network and **wlan1** is used as WLAN interface for creating local WiFi AP.
 
-To connect to the Internet via device it is also required to configure routing and firewall. To configure the device for getting Internet I used the [website](http://raspberry-at-home.com/hotspot-wifi-access-point).
+To connect to the Internet via this device is also required to configure routing and firewall. To configure device for getting Internet I used the [source](http://raspberry-at-home.com/hotspot-wifi-access-point) as example.
 
-To appoint wireless adapters static names based on their MAC addresses create a file /etc/udev/rules.d/70-persistent-net.rules and put here the following:
+Additional information to resolve some local problems.
+
+To appoint to the wireless adapters a static names based on their MAC addresses I create a file /etc/udev/rules.d/70-persistent-net.rules and put here the following:
+
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="<put your wifi dongle wlan0 MAC address here>", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="wlan0"
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="<put your wifi dongle wlan1 MAC address here>", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="wlan1"
-(https://forum.armbian.com/topic/5167-orange-pi-zero-wifi-adapter-wlx20xxxxxxxxxx/)
+
+Source (https://forum.armbian.com/topic/5167-orange-pi-zero-wifi-adapter-wlx20xxxxxxxxxx/)
+
+Useful link to start script by event like usb device detection https://unix.stackexchange.com/questions/65891/how-to-execute-a-shellscript-when-i-plug-in-a-usb-device.
+
+In case of error: "Failed to start hostapd.service: Unit hostapd.service is masked" do the following:
+sudo systemctl unmask hostapd
+sudo systemctl enable hostapd
+sudo systemctl start hostapd
 
 For the application to start correctly, a certain daemons startup order required as, for instance, "isc-dhcp-server" daemon requires that a network interface should be already configured and started before the daemon. To the "/etc/rc.local" I added the code below:
 
 ```
 systemctl stop wpa_supplicant
 systemctl stop isc-dhcp-server
-ifdown wlan1
-ifup wlan1
+ifdown wlan0
+ifup wlan0
 systemctl start wpa_supplicant
 systemctl start isc-dhcp-server
 systemctl restart hostapd
 ```
 <br>
+
+For a button working it is necessary to install number of packages https://github.com/friendlyarm/RPi.GPIO_NP
+
+To install python 3.7 first delete default 3.5 version and then use commands below:
+```
+sudo apt update
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget
+
+wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
+sudo tar xzf Python-3.7.4.tgz
+
+cd Python-3.7.4
+
+sudo ./configure
+sudo make
+sudo make install
+```
+
+
+Install and update packages:
+```
+apt install python3-pip wiringpi
+pip3 install Flask>=2.1.0 Werkzeug==2.2.2 requests==2.31.0 flask_session==0.5.0
+```
+
+Install bind9 and enable it, so that the device works as a DNS cache server if needed or simple use wide available 1.1.1.1 and 8.8.8.8.
 
 ## How the device works
 
@@ -101,10 +145,10 @@ First of all, to use a device it should be booted into the OS and starts my Pyth
 ```
 $ cat /etc/supervisor/conf.d/flask_app.conf
 
-[program:flask_app]                                                                  
-command = flask run -h 192.168.0.35                                      
-directory = /var/www/wifiextender                            
-autostart = true                                                                
+[program:flask_app]
+command = flask run -h 192.168.0.35
+directory = /var/www/wifiextender
+autostart = true
 autorestart = true
 ```
 

@@ -1,0 +1,8 @@
+# Edimax
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="80:1f:02:ab:a2:93", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="wlan0"
+
+# Edup 5G
+#SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="1C:BF:CE:E9:47:50", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="wlan0"
+
+# easy idea
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:e0:5d:01:ec:8e", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="wlan1"

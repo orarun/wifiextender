@@ -1,0 +1,1 @@
+ATTRS{idVendor}=="7392", ATTRS{idProduct}=="7811", RUN+="/etc/restart-services.sh"
